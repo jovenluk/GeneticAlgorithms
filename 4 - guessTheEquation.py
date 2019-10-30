@@ -16,7 +16,9 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 
-#¶ fCHROMOSOME
+# =============================================================================
+# ---- fCHROMOSOME
+# =============================================================================
 # ·······················································································
 # Definción de un cromosoma
 # ·······················································································
@@ -27,33 +29,35 @@ class _cromosoma:
         global idx
         self.Idx = idx
         idx += 1
-        
+
     def __repr__(self):
         return "<Cromosoma :%5s :%s :%s>" % (self.Idx, self.Genes, round(self.Fitness,5))
 
     def __str__(self):
         return "<Cromosoma :%5s :%s :%s>" % (self.Idx, self.Genes, round(self.Fitness,5))
- 
+
     def fnGetFitness(self, genes):
        result = 0
        for i in range(0, len(genes)):
-              result += genes[i]*X[i]  
+              result += genes[i]*X[i]
        #return 1/(abs(y-result)+1)
-       return abs(y-result)   
+       return abs(y-result)
 
     def fnUpdate(self):
         self.Fitness = self.fnGetFitness(self.Genes) # el cromosoma contiene su fitness
 
-# fPOPULATION
+# =============================================================================
+# ---- fPOPULATION
+# =============================================================================
 # ·······················································································
 # INICIALIZAMOS LA POBLACION
 # ·······················································································
 def fnFeedPopulation(initial_population = False):
-       
+
        if initial_population == True:
               for n in range(0, n_cromosomas_per_population):
                      genes = [] # creamos los genes
-              
+
                      # fGENOME
                      #☺ iniciliazmos el cromosoma con números aleatorios entre -100 y 100
                      for i in range(0,len(geneset)):
@@ -63,7 +67,9 @@ def fnFeedPopulation(initial_population = False):
                      population.append(cromosoma)
               return population.copy()
 
-# fELITISM
+# =============================================================================
+# ---- fELITISM
+# =============================================================================
 # ·······················································································
 # ELITISM
 # ·······················································································
@@ -76,23 +82,25 @@ def fnElitism(rankedPopulation):
               selectionResults = []
               for i in range(0, eliteSize): # cogemos los elementos por elitism
                      selectionResults.append( rankedPopulation[i] )
-                     
+
        # quitamos de population los elitism que acabo de coger si procede
        for n in range(0, eliteSize):
               rankedPopulation.pop(0)
        # del resto de population hacemos una RouletteWheel
        # obtengo tantos elementos como necesito
        newPopulation = fnRouletteWheel(rankedPopulation, sizeOriginalRankedPopulation-eliteSize) # aquí tenemos la población seleccionada por RouletteWheel
-       
+
        # newPopulation contiene el elitism y el resto de population elegido por roulettewheel
        for n in selectionResults:
               resultPopulation.append(n)
        for n in newPopulation:
               resultPopulation.append(n)
-       
+
        return selectionResults, resultPopulation
 
-# fCROSSOVER
+# =============================================================================
+# ---- fCROSSOVER
+# =============================================================================
 # ·······················································································
 # MATING
 # obtiene un número de hijos de descendencia, selecciona a los padres y los cruza repetidamente
@@ -104,18 +112,20 @@ def fnMating(parent1, parent2, max_n_children = 10):
        # los dos padres elegidos también sobreviven
        children.append(parent1)
        children.append(parent2)
-       
+
        # cuánta descendencia queremos?
        n_children = random.randint(1, max_n_children)
        for n in range(0, n_children): # cruzamos los padres repetidas veces
               child = fnCrossOver(parent1, parent2)
               child = fnMutate(child)
-              
+
               children.append(child)
-                
+
        return children.copy()
 
-# fMATINGPOOL
+# =============================================================================
+# ---- fMATINGPOOL
+# =============================================================================
 # ·······················································································
 # MATING POOL - devuelve dos padres
 # ·······················································································
@@ -125,7 +135,9 @@ def fnMatingPool(rankedPopulation):
        return parent1, parent2
 
 
-# fSELECTION
+# =============================================================================
+# ---- fSELECTION
+# =============================================================================
 # ·······················································································
 # ROULETTE WHEEL para encontrar los dos padres a cruzar
 # ·······················································································
@@ -148,7 +160,7 @@ def fnRouletteWheelGetParent(population):
        posicion -= 1
        return population[posicion]
 
-# fSELECTION       
+# fSELECTION
 # ·······················································································
 # SELECTION - ROULETTE WHEEL selecciona tantos elementos como se le pide
 # ·······················································································
@@ -156,15 +168,15 @@ def fnRouletteWheel(population, size):
        probabilities = []
        prob = 0.0
        sumaFitness = sum(n.Fitness for n in population)
-       population = fnRankPopulation(population) 
-       
+       population = fnRankPopulation(population)
+
        newPopulation = []
-       
+
        for i in population:
               prob += (i.Fitness / sumaFitness)
               probabilities.append(prob)
-              
-       for tiradas in range(0, size):              
+
+       for tiradas in range(0, size):
               # tiramos la bola
               bola = random.random()
               # encontramos qué posición nos devuelve
@@ -174,10 +186,12 @@ def fnRouletteWheel(population, size):
                             posicion +=1
               posicion -= 1
               newPopulation.append(population[posicion])
-       
+
        return newPopulation
 
-# fFITNESS
+# =============================================================================
+# ---- fFITNESS
+# =============================================================================
 # ·······················································································
 # Calculamos el FITNESS como el inverso del absoluto del error
 # ·······················································································
@@ -189,11 +203,13 @@ def fnGetFitnessCromosoma(cromosoma):
 def fnGetFitnessGenes(genes):
        result = 0
        for i in range(0, len(genes)):
-              result += genes[i]*X[i]  
+              result += genes[i]*X[i]
        #return 1/(abs(y-result)+1)
        return abs(y-result)
 
-# fMUTATION
+# =============================================================================
+# ---- fMUTATION
+# =============================================================================
 # ·······················································································
 # MUTACION
 # Aplicamos, si 0 division y si 1 multiplicacion
@@ -212,7 +228,9 @@ def fnMutate(cromosoma):
        #cromosoma.Fitness = fnGetFitnessCromosoma(cromosoma)
        return cromosoma
 
-# fCROSSOVER
+# =============================================================================
+# ---- fCROSSOVER
+# =============================================================================
 # ·······················································································
 # CROSSOVER
 # Cruzamos dos cromosomas y devolvemos un hijo
@@ -233,10 +251,10 @@ def fnCrossOver(cromosoma1, cromosoma2):
                        genes.append(cromosoma2.Genes[i])
                 for i in range(slicer, len(cromosoma2.Genes)):
                        genes.append(cromosoma1.Genes[i])
-                
+
          cromosoma = _cromosoma(genes)
          child = cromosoma
-         return child                             
+         return child
 
 # ·······················································································
 # RANK
@@ -265,7 +283,7 @@ def fnNewPopulation(elitism, children):
                      pendingCromosomas -= 1
                      if pendingCromosomas == 0:
                             break
-              
+
        return population.copy()
 
 
@@ -278,7 +296,9 @@ def fnIsAlreadyInPopulation(children, population):
                      return True
        return False
 
-# fGA
+# =============================================================================
+# ---- fGA
+# =============================================================================
 # ·······················································································
 # ALGORITMO GENETICO COMPLETO
 #
@@ -286,26 +306,28 @@ def fnIsAlreadyInPopulation(children, population):
 def fnGeneticAlgorithm():
        population = [] # guardará una generación
        population = fnFeedPopulation(initial_population = True)
-       
+
        for n in range(0, tournaments):
               population = fnRankPopulation(population) # ordenamos la population para que queden los mejores arriba
               elitism, population = fnElitism(population) # nos quedamos con los n mejores y hacemos una selección por RouletteWheel del resto
               newChildren = []
               for i in range(0, n_cruces):
-                     
+
                      parent1, parent2 = fnMatingPool(population) # generamos el mating pool (usa RouletteWheel para la selección de los dos padres)
                      children = fnMating(parent1, parent2) # cruzamos a los padres y obtenemos una ristra de hijos
                      for n in children:
                             newChildren.append(n) # añadimos a la prole
-              
+
               population = fnRankPopulation(fnNewPopulation(elitism, newChildren))
               resultadoPropuesto = population[0]
               if resultadoPropuesto.Fitness == 0:
                      break
-              
-       return resultadoPropuesto        
 
-# fINITIALVALUES
+       return resultadoPropuesto
+
+# =============================================================================
+# ---- fINITIALVALUES
+# =============================================================================
 # ·······················································································
 # AJUSTANDO LOS PARAMETROS DE UNA REGRESION
 # ·······················································································
@@ -325,9 +347,11 @@ n_cruces = 10 # cuántos cruces de padres queremos
 # el elitismo en esta función está asegurado porque nos quedamos con los mejores
 
 
-# fMAIN
+# =============================================================================
+# ---- fMAIN
+# =============================================================================
 fnGeneticAlgorithm()
-      
+
 
 
 
